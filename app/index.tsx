@@ -3,10 +3,12 @@ import { Image, ScrollView, Text, View } from "react-native";
 //* Add styling support for web
 import { NativeWindStyleSheet } from "nativewind";
 import { StatusBar } from "expo-status-bar";
-import { Link, router } from "expo-router";
+import { Redirect, router, useNavigation } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "@/constants";
 import { CustomBtn } from "@/components/CustomBtn";
+import { useEffect, useState } from "react";
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 NativeWindStyleSheet.setOutput({
     default: "native",
@@ -14,6 +16,28 @@ NativeWindStyleSheet.setOutput({
 //*
 
 export default function App() {
+    const [isBtnLoading, setIsBtnLoading] = useState(false);
+    const { isLoading, isLoggedIn } = useGlobalContext()
+    const navigation = useNavigation();
+
+    if (!isLoading && !isLoggedIn) return <Redirect href="/home" />
+
+    const handlePress = () => {
+        setIsBtnLoading(true);
+        router.push('/login');
+    };
+
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            if (navigation.isFocused()) {
+                setIsBtnLoading(false);
+            }
+        });
+
+        return unsubscribe;
+    }, [navigation]);
+
     return (
         <SafeAreaView className="bg-primary h-full">
             <ScrollView contentContainerStyle={{ height: '100%' }}>
@@ -46,13 +70,14 @@ export default function App() {
 
                     <CustomBtn
                         title="Continue with Email"
-                        handlePress={() => router.push('/login')}
-                        containerStyles="w-full mt-7"
+                        handlePress={() => handlePress()}
+                        isLoading={isBtnLoading}
+                    // containerStyles="w-full mt-7"
 
                     />
                 </View>
             </ScrollView>
-            <StatusBar backgroundColor="#16622" style="light" />
+            <StatusBar style="light" />
         </SafeAreaView>
     );
 }
