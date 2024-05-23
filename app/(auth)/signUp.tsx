@@ -5,8 +5,10 @@ import { Link, router } from 'expo-router';
 import CustomBtn from '@/components/CustomBtn';
 import { FormField } from '@/components/FormField';
 import { images } from '@/constants';
-import { register } from '../../lib/appwrite';
+// import { register } from '../../lib/appwrite';
 import { StatusBar } from 'expo-status-bar';
+import { FIREBASE_AUTH } from '@/FirebaseCondig';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 export default function SignUp() {
     const [form, setForm] = useState({
@@ -16,26 +18,44 @@ export default function SignUp() {
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const submit = async () => {
-        if (!Object.values(form).every(Boolean)) {
-            Alert.alert('Please fill in all the fields.');
-            return;
-        }
+    // const submit = async () => {
+    //     if (!Object.values(form).every(Boolean)) {
+    //         Alert.alert('Please fill in all the fields.');
+    //         return;
+    //     }
 
-        setIsSubmitting(true);
+    //     setIsSubmitting(true);
+    //     try {
+    //         const res = await register(form.email, form.password, form.username);
+    //         router.replace('/home');
+    //     } catch (err: unknown) {
+    //         if (err instanceof Error) {
+    //             Alert.alert('Error', err.message);
+    //         } else {
+    //             Alert.alert('Error', 'An unknown error occurred');
+    //         }
+    //     } finally {
+    //         setIsSubmitting(false);
+    //     }
+    // };
+
+    const auth = FIREBASE_AUTH
+
+    async function submit() {
         try {
-            const res = await register(form.email, form.password, form.username);
-            router.replace('/home');
-        } catch (err: unknown) {
-            if (err instanceof Error) {
-                Alert.alert('Error', err.message);
-            } else {
-                Alert.alert('Error', 'An unknown error occurred');
-            }
+            setIsSubmitting(true)
+            const res = await createUserWithEmailAndPassword(auth, form.email, form.password)
+            console.log('res', res);
+            // router.replace('/home');
+            // await login(form.email, form.password)
+        } catch (error: any) {
+            Alert.alert('Error', error.message);
+            console.log('err', error);
         } finally {
-            setIsSubmitting(false);
+
+            setIsSubmitting(false)
         }
-    };
+    }
 
     return (
         <SafeAreaView className="bg-primary h-full">

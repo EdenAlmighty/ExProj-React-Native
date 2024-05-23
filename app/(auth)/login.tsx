@@ -1,9 +1,12 @@
+import { FIREBASE_AUTH } from '@/FirebaseCondig';
 import CustomBtn from '@/components/CustomBtn';
 import { FormField } from '@/components/FormField';
 import { images } from '@/constants';
-import { Link } from 'expo-router';
+// import { login } from '@/lib/appwrite';
+import { Link, router } from 'expo-router';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useState } from 'react';
-import { Image, ScrollView, Text, View } from 'react-native';
+import { Image, KeyboardAvoidingView, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Login() {
@@ -12,13 +15,38 @@ export default function Login() {
         password: ''
     })
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const auth = FIREBASE_AUTH
 
-    const submit = () => { }
+    async function submit() {
+        try {
+            setIsSubmitting(true)
+            const res = await signInWithEmailAndPassword(auth, form.email, form.password)
+            console.log('res', res);
+            // await login(form.email, form.password)
+        } catch (err) {
+            console.log('err', err);
+        } finally {
+
+            setIsSubmitting(false)
+        }
+    }
+    // async function submit() {
+    //     try {
+    //         setIsSubmitting(true)
+    //         await login(form.email, form.password)
+    //     } catch (err) {
+    //         console.log('err', err);
+    //     } finally {
+
+    //         setIsSubmitting(false)
+    //     }
+    // }
 
     return (
         <SafeAreaView className='bg-primary h-full'>
             <ScrollView>
                 <View className='w-full justify-center min-h-[85vh] px-4 my-6'>
+                    <KeyboardAvoidingView behavior='padding'>
                     <Image source={images.logo}
                         resizeMode='contain'
                         className='w-[115px] h-[35px]' />
@@ -41,7 +69,7 @@ export default function Login() {
 
                     <CustomBtn
                         title='Login'
-                        handlePress={submit}
+                        handlePress={() => submit}
                         containerStyles="mt-7"
                         isLoading={isSubmitting}
                     />
@@ -50,7 +78,7 @@ export default function Login() {
                         <Text className='text-lg text-gray-100 font-pregular'>Don't have an account?</Text>
                         <Link href="/signUp" className='text-lg font-psemibold text-secondary'>Sign Up</Link>
                     </View>
-
+                    </KeyboardAvoidingView>
                 </View>
             </ScrollView>
         </SafeAreaView>

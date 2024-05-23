@@ -1,3 +1,7 @@
+import { LogBox } from 'react-native';
+LogBox.ignoreLogs([
+    'Require cycle:'
+  ]);
 import { SplashScreen, Stack } from "expo-router";
 import { useFonts } from "expo-font";
 import { useEffect } from "react";
