@@ -1,48 +1,41 @@
-import { FIREBASE_AUTH } from "@/FirebaseCondig";
-import { User, onAuthStateChanged } from "firebase/auth";
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
-const GlobalContext = createContext();
-export const useGlobalContext = () => useContext(GlobalContext);
+import { getCurrentUser } from '../lib/appwrite'
 
-const GlobalProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+const GlobalContext = createContext()
+export const useGlobalContext = () => useContext(GlobalContext)
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (user) => {
-      try {
-        if (user) {
-          setUser(user);
-          setIsLoggedIn(true);
-        } else {
-          setUser(null);
-          setIsLoggedIn(false);
-        }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    });
+export default function GlobalProvider({ children }) {
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [user, setUser] = useState(null)
+    const [isLoading, setIsLoading] = useState(true)
 
-    return () => unsubscribe();
-  }, []);
+    useEffect(() => {
+        getCurrentUser()
+            .then((res) => {
+                if (res) {
+                    setIsLoggedIn(true)
+                    setUser(res)
+                } else {
+                    setIsLoggedIn(false)
+                    setUser(null)
+                }
+            }).catch((err) => {
+                console.log('err: ', err)
+            }).finally(() => {
+                setIsLoading(false)
+            })
 
-  return (
-    <GlobalContext.Provider
-      value={{
-        isLoggedIn,
-        setIsLoggedIn,
-        user,
-        setUser,
-        loading,
-      }}
-    >
-      {children}
-    </GlobalContext.Provider>
-  );
-};
+    }, []);
 
-export default GlobalProvider;
+
+    return (
+        <GlobalContext.Provider
+            value={{
+
+            }}
+        >
+            {children}
+        </GlobalContext.Provider>
+    )
+}

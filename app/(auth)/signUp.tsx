@@ -7,8 +7,9 @@ import { FormField } from '@/components/FormField';
 import { images } from '@/constants';
 // import { register } from '../../lib/appwrite';
 import { StatusBar } from 'expo-status-bar';
-import { FIREBASE_AUTH } from '@/FirebaseCondig';
+// import { FIREBASE_AUTH } from '@/FirebaseCondig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { FIREBASE_AUTH } from '@/FirebaseCondig';
 
 export default function SignUp() {
     const [form, setForm] = useState({
